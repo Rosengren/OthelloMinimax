@@ -12,4 +12,5 @@ import org.junit.runners.Suite;
         ViewTest.class
 })
 public class othelloTestSuite {
+
 }
