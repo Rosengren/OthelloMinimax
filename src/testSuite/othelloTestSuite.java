@@ -7,9 +7,10 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({
-        ControllerTest.class,
-        ModelTest.class,
-        ViewTest.class
+        BoardTest.class,
+//        ControllerTest.class,
+//        ModelTest.class,
+//        ViewTest.class
 })
 public class othelloTestSuite {
 
