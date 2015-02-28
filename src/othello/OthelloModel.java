@@ -10,6 +10,9 @@ public class OthelloModel extends Observable {
     private static final int BOARD_WIDTH = 8;
     private static final int BOARD_HEIGHT = 8;
 
+    private static final char WHITE = 'W';
+    private static final char BLACK = 'B';
+
     private CommandManager commandManager;
     private Board board;
 
@@ -19,6 +22,14 @@ public class OthelloModel extends Observable {
         blackPlayerTurn = false;
         board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
         commandManager = new CommandManager();
+    }
+
+    private void initializeBoard() {
+        board.reset();
+        board.setTile(3, 3, 'W');
+        board.setTile(4, 4, 'W');
+        board.setTile(3, 4, 'B');
+        board.setTile(4, 3, 'B');
     }
 
     public char[][] getBoard() {

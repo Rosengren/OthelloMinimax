@@ -10,6 +10,12 @@ public class Board {
         board = new char[rows][cols];
     }
 
+    public void reset() {
+        for (int row = 0; row < board.length; row++)
+            for (int col = 0; col < board[row].length; col++)
+                board[row][col] = ' ';
+    }
+
     public void setTile(int row, int col, char item) {
         if (validTile(row, col)) {
             board[row][col] = item;

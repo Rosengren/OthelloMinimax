@@ -8,7 +8,8 @@ public class MoveCommand implements Command {
     }
 
     @Override
-    public void unexecute() {
+    public void undo() {
 
     }
+
 }
