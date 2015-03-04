@@ -22,7 +22,7 @@ public class View implements Observer {
     private static final int MESSAGE_TYPE = 0;
     private static final int MESSAGE = 1;
 
-    private static final int HEADER_HEIGHT = 50; // 20 if remove menu
+    private static final int HEADER_HEIGHT = 20; // 20 if remove menu
     private static final int STATUS_BAR_HEIGHT = 50;
     private static final int WINDOW_WIDTH = 600;
     private static final int WINDOW_HEIGHT = 600 + HEADER_HEIGHT + STATUS_BAR_HEIGHT;
@@ -41,9 +41,6 @@ public class View implements Observer {
     private static final int BOARD_HEIGHT = 8;
 
     private JFrame window;
-    private JMenuBar mainMenuBar;
-    private JMenuItem undo;
-    private JMenuItem redo;
 
     private JPanel boardPanel;
     private JPanel scorePanel;
@@ -59,8 +56,6 @@ public class View implements Observer {
     private Image blackDisc;
     private Image whiteDisc;
 
-    private JMenuItem save;
-    private JMenuItem load;
 
     /**
      * Constructor
@@ -71,7 +66,6 @@ public class View implements Observer {
     public View() {
 
         initIconImages();
-        initMenuBar();
         initScoreBoard();
         initBoardLayout();
         initMessageBoard();
@@ -100,31 +94,6 @@ public class View implements Observer {
             System.exit(0);
         }
     }
-
-
-    /**
-     * initialize menu bar
-     */
-    private void initMenuBar() {
-        mainMenuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-
-        JMenu movesMenu = new JMenu("Moves");
-        undo = new JMenuItem("Undo");
-        redo = new JMenuItem("Redo");
-        movesMenu.add(undo);
-        movesMenu.add(redo);
-
-        mainMenuBar.add(fileMenu);
-        mainMenuBar.add(movesMenu);
-
-        save = new JMenuItem("Save");
-        load = new JMenuItem("Load");
-
-        fileMenu.add(save);
-        fileMenu.add(load);
-    }
-
 
     /**
      * initialize score board.
@@ -241,7 +210,6 @@ public class View implements Observer {
         window.add(boardPanel, BorderLayout.CENTER);
         window.add(messagePanel, BorderLayout.SOUTH);
         window.add(boardPanel);
-        window.setJMenuBar(mainMenuBar);
         window.pack();
         window.setVisible(true);
     }
@@ -280,15 +248,6 @@ public class View implements Observer {
                 tiles[i][j].addActionListener(controller);
             }
         }
-
-        // add redo/undo
-        undo.addActionListener(controller);
-//        redo.addActionListener(controller);
-
-        // add save/load
-//        save.addActionListener(controller);
-//        load.addActionListener(controller);
-
     }
 
 
@@ -386,7 +345,11 @@ public class View implements Observer {
                     displayMessage(message[MESSAGE]);
                 }
             }
-
+        } else if (arg instanceof char[][]) {
+            char[][] b = (char[][])arg;
+            Board board = new Board(b.length, b[0].length);
+            board.setBoard(b);
+            redrawBoard(board);
         }
     }
 

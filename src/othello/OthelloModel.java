@@ -1,308 +1,333 @@
 package othello;
-
-import commands.Command;
-import commands.CommandManager;
-
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 
-public class OthelloModel extends Observable {
+public class OthelloModel extends Observable implements Cloneable {
 
-    private static final int BOARD_HEIGHT = 8;
-    private static final int BOARD_WIDTH = 8;
-    private static final int ROW = 0;
-    private static final int COL = 1;
+    public static final String ERR_PLAYER_MOVED
+            = "Cannot add hole area. A player did move.";
 
-    private static final int[][] ALL_DIRECTIONS =
-            new int[][] { {0,1}, {0,-1}, {1,-1}, {1,0},
-                          {1,1}, {-1,0}, {-1,1}, {-1,-1} };
+    public static final String ERR_NO_ACTIVE_GAME
+            = "No active game";
 
-    private static final char WHITE = 'W';
-    private static final char BLACK = 'B';
+    public static final String ERR_OFF_BOARD_MOVE
+            = "The move position has to be on the board";
 
-    private int whiteCount, blackCount;
+    public static final String ERR_COLOR_IN_RECTANGLE
+            = "You can't place the hole here. There are color pieces.";
 
-    private char player;
-    protected String winner;
+    public static final String ERR_NO_VALID_RECTANGLE
+            = "The specified rectangle isn't valid. Valid is something"
+            + "like A1:B3 or A1:A1. The first position has to be on the"
+            + "top left.";
 
-    private CommandManager commandManager;
-    private Board board;
+    private Field currentPlayer = Field.BLACK;
 
-    public boolean blackPlayerTurn;
+    private boolean isRunning = true;
 
-    public OthelloModel() {
-        blackPlayerTurn = false;
-        winner = "";
-        player = BLACK;
-        board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
-//        countBoardPieces();
-        commandManager = new CommandManager();
-        initializeBoard();
+    private boolean submittedMove = false;
+
+    public NewBoard board;
+
+    private final int[][] adjacentFields = {{-1, -1}, {0, -1}, {1, -1},
+            {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+
+    public OthelloModel(int width, int height) {
+        board = new NewBoard(width, height);
+        checkState();
     }
 
-    public void playMove(int row, int col) {
-        if (isLegalMove(row, col)) {
-            commandManager.executeCommand(new PlacePieceCommand(this, row, col, BOARD_WIDTH, BOARD_HEIGHT));
+    public OthelloModel(int width, int height, String situation) {
+        board = new NewBoard(width, height, situation);
+        checkState();
+    }
+
+    private void checkState() {
+        if (!isMovePossible(Field.BLACK)) {
+            if (!isMovePossible(Field.WHITE)) {
+                this.isRunning = false;
+            } else {
+                this.currentPlayer = Field.WHITE;
+            }
+        }
+    }
+
+    private boolean isMovePossible(Field player) {
+        return (getPossibleMoves(player).size() > 0);
+    }
+
+    public List<Position> getPossibleMoves(Field player) {
+        if (!isRunning) {
+            throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
+        }
+
+        List<Position> possibleMoves = new ArrayList<Position>();
+
+        Position pos;
+        for (int x = 0; x < board.width; x++) {
+            for (int y = 0; y < board.height; y++) {
+                pos = new Position(x, y);
+                if (isMovePositionValid(pos)
+                        && (getNrOfSwitches(player, pos) > 0)) {
+                    possibleMoves.add(pos);
+                }
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    private boolean hasPiece(Position pos) {
+        return (board.isPositionOnBoard(pos) && board.get(pos) != null
+                && board.get(pos) != Field.HOLE);
+    }
+
+    private boolean isMovePositionValid(Position pos) {
+        boolean isMovePositionValid = false;
+
+        if (!board.isPositionOnBoard(pos))
+            return false;
+
+        for (int[] field : adjacentFields) {
+            Position tmp = new Position(pos.x + field[0],
+                    pos.y + field[1]);
+            if (hasPiece(tmp))
+                isMovePositionValid = true;
+        }
+
+        if (board.get(pos.x, pos.y) != null) {
+            isMovePositionValid = false;
+        }
+
+        return isMovePositionValid;
+    }
+
+    private void nextPlayer() {
+        if (!isRunning)
+            throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
+
+        currentPlayer = (currentPlayer == Field.BLACK) ? Field.WHITE : Field.BLACK;
+    }
+
+    public int move(int row, int col) {
+        return move(new Position(row, col));
+    }
+
+    public int move(Position pos) {
+        if (!isRunning)
+            throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
+
+        int returnCode = -1;
+        int switches;
+
+        if (!board.isPositionOnBoard(pos))
+            throw new IllegalArgumentException(ERR_OFF_BOARD_MOVE);
+
+        if (isMovePositionValid(pos)
+                && (getNrOfSwitches(currentPlayer, pos) > 0)) {
+            board.set(pos, currentPlayer);
+
+            for (int[] direction : adjacentFields) {
+                switches = getNrOfIncludedPieces(currentPlayer, pos,
+                        direction[0], direction[1]);
+
+                if (switches > 0)
+                    switchPieces(currentPlayer, pos, direction[0], direction[1]);
+            }
+
+            nextPlayer();
+
+            if (!isMovePossible(getCurrentPlayer())) {
+                Field nextPlayer = getWaitingPlayer();
+                if (isMovePossible(nextPlayer)) {
+                    nextPlayer();
+                    returnCode = 1;
+                } else {
+                    setFinished();
+                    returnCode = 2;
+                }
+            } else {
+                returnCode = 0;
+            }
+
+            submittedMove = true;
         }
 
         updateBoard();
+        return returnCode;
     }
 
-    private void initializeBoard() {
-        board.reset();
-        board.setTile(3, 3, 'W');
-        board.setTile(4, 4, 'W');
-        board.setTile(3, 4, 'B');
-        board.setTile(4, 3, 'B');
+    public Field getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    private int getNrOfIncludedPieces(Field player, Position pos, int xDir, int yDir) {
+        int switches = 0;
+        int opponentCount = 0;
+        Field opponent = (player == Field.WHITE) ? Field.BLACK : Field.WHITE;
+
+        for (int tmp = 1;
+             (pos.x + tmp * xDir >= 0)
+             && (pos.x + tmp * xDir < board.width)
+             && (pos.y + tmp * yDir >= 0)
+             && (pos.y + tmp * yDir < board.height);
+             tmp++) {
+
+            Field piece = board.get(pos.x + tmp * xDir, pos.y + tmp * yDir);
+
+            if (piece == player) {
+                switches += opponentCount;
+                break;
+            } else if (piece == Field.HOLE) {
+                return 0;
+            } else if (piece == opponent) {
+                opponentCount++;
+            } else if (piece == null) {
+                return 0;
+            }
+        }
+
+        return switches;
+    }
+
+    private void switchPieces(Field player, Position pos, int xDir, int yDir) {
+        if (!isRunning)
+            throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
+
+        Field opponent = (player == Field.WHITE) ? Field.BLACK : Field.WHITE;
+
+        for (int tmp = 1;; tmp++) {
+            if (board.get(pos.x + tmp * xDir, pos.y + tmp * yDir) == player)
+                break;
+            else if (board.get(pos.x + tmp * xDir, pos.y + tmp * yDir) == opponent)
+                board.set(pos.x + tmp * xDir, pos.y + tmp * yDir, player);
+        }
+    }
+
+    private int getNrOfSwitches(Field player, Position pos) {
+        int switches = 0;
+
+        for (int[] direction : adjacentFields) {
+            switches += getNrOfIncludedPieces(player, pos, direction[0], direction[1]);
+        }
+
+        return switches;
+    }
+
+    public int[] getResult() {
+        int[] result = new int[2];
+        result[0] = countPieces(Field.WHITE);
+        result[1] = countPieces(Field.BLACK);
+        return result;
+    }
+
+    private int countPieces(Field player) {
+        int counter = 0;
+        for (int x = 0; x < board.width; x++) {
+            for (int y = 0; y < board.height; y++) {
+                if (board.get(x, y) == player) {
+                    counter++;
+                }
+            }
+        }
+        return counter;
+    }
+
+    public void setFinished() {
+        if (!isRunning)
+            throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
+        isRunning = false;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public boolean isValidRectangle(Position[] rectangle) {
+        return board.isPositionOnBoard(rectangle[0])
+                && board.isPositionOnBoard(rectangle[1])
+                && rectangle[0].x <= rectangle[1].x
+                && rectangle[0].y <= rectangle[1].y;
+    }
+
+    public boolean isColorInRectangle(Position[] rectangle) {
+        if (!isValidRectangle(rectangle))
+            throw new IllegalArgumentException(ERR_NO_VALID_RECTANGLE);
+
+        for (int x = rectangle[0].x; x <= rectangle[1].x; x++) {
+            for (int y = rectangle[0].y; y <= rectangle[1].y; y++) {
+                if (board.get(x, y) == Field.BLACK || board.get(x, y) == Field.WHITE)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean makeHole(Position[] rectangle) {
+        if (submittedMove) {
+            throw new IllegalStateException(ERR_PLAYER_MOVED);
+        } else if (!isValidRectangle(rectangle)) {
+            throw new IllegalStateException(ERR_NO_VALID_RECTANGLE);
+        } else if (isColorInRectangle(rectangle)) {
+            throw new IllegalArgumentException(ERR_COLOR_IN_RECTANGLE);
+        }
+
+        for (int x = rectangle[0].x; x <= rectangle[1].x; x++) {
+            for (int y = rectangle[0].y; y <= rectangle[1].y; y++) {
+                board.set(x, y, Field.HOLE);
+            }
+        }
+
+        if (getPossibleMoves(currentPlayer).size() == 0)
+            nextPlayer();
+
+        return true;
+    }
+
+    public void setBoard(NewBoard newBoard) {
+        board = newBoard;
+    }
+
+    public boolean wasMoveSubmitted() {
+        return submittedMove;
+    }
+
+    public int[] abortGame() {
+        int[] result = getResult();
+        setFinished();
+        return result;
+    }
+
+    public Field getWaitingPlayer() {
+        return (getCurrentPlayer() == Field.BLACK) ? Field.WHITE : Field.BLACK;
+    }
+
+    public void updateBoard() {
+        setChanged();
+        notifyObservers(board.getBoard());
     }
 
     public char[][] getBoard() {
         return board.getBoard();
     }
 
-    public void setBoard(char[][] newBoard) {
-        board.setBoard(newBoard);
-    }
-
-
-    public void updateBoard() {
-        setChanged();
-        notifyObservers(board);
-    }
-
-    private class PlacePieceCommand implements Command {
-
-        private OthelloModel model;
-
-        private char[][] previousBoardState;
-        private char previousPlayer;
-        private char[][] nextBoardState;
-        private char nextPlayer;
-
-        private PlacePieceCommand(OthelloModel model, int row, int col, int width, int height) {
-            this.model = model;
-
-            previousPlayer = getCurrentPlayer();
-            previousBoardState = new char[width][height];
-            nextBoardState = new char[width][height];
-
-            char[][] modelBoard = model.getBoard();
-
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    previousBoardState[i][j] = modelBoard[i][j];
-                    nextBoardState[i][j] = modelBoard[i][j];
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        try {
+            NewBoard clonedBoard = new NewBoard(board.width, board.height);
+            for (int x = 0; x < board.width; x++) {
+                for (int y = 0; y < board.height; y++) {
+                    clonedBoard.set(x, y, board.get(x, y));
                 }
             }
-
-            nextBoardState = makeMove(row, col);
-            nextPlayer = getCurrentPlayer();
+            OthelloModel cloned = (OthelloModel)super.clone();
+            cloned.setBoard(clonedBoard);
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
         }
 
-        public char[][] makeMove(int row, int col) {
-
-            if (model.isLegalMove(row, col)) {
-                model.flipAllPieces(row, col);
-
-                model.switchPlayer();
-                if (model.getPossibleMoves().size() == 0) { // empty
-                    if (model.player == WHITE) {
-                        System.out.println("BLACK PASS TURN");
-//                    othelloState.aiPassTurn();
-                    } else {
-                        System.out.println("WHITE PASS TURN");
-//                    othelloState.playerPassTurn();
-                    }
-
-                    model.switchPlayer(); // pass turn
-                } else {
-                    System.out.println("NOBODY PASS TURN");
-//                othelloState.nobodyPassTurn();
-                }
-
-                if (!model.haveWinner()) {
-                    if (model.player == WHITE) {
-                        System.out.println("Other Player's Turn");
-//                    playAITurn();
-                    }
-
-                    if (model.haveWinner())
-                        model.endGame();
-
-                } else {
-                    model.endGame();
-                }
-
-                model.updateBoard();
-                model.updatePlayer();
-
-            } else {
-                model.setChanged();
-                model.notifyObservers("Invalid Move");
-            }
-
-            return board.getBoard();
-
-        }
-
-        @Override
-        public void execute() {
-            model.setBoard(nextBoardState);
-            model.player = nextPlayer;
-        }
-
-        @Override
-        public void undo() {
-            model.setBoard(previousBoardState);
-            model.player = previousPlayer;
-        }
-
+        return null; // TODO: FIX THIS
     }
-
-
-    public boolean haveWinner() {
-        return (!winner.equals(""));
-    }
-
-    public void endGame() {
-        updateBoard();
-        updatePlayer();
-        setChanged();
-        notifyObservers(new String[] {"game over", getWinner()});
-    }
-
-    public String getWinner() {
-        return winner;
-    }
-
-    public void checkForWinner() {
-
-        countBoardPieces();
-
-        if (getPossibleMoves().size() == 0) { // empty
-            switchPlayer();
-            if (getPossibleMoves().size() == 0) { // empty
-
-                if (whiteCount > blackCount)
-                    winner = Character.toString(WHITE);
-                else if (blackCount > whiteCount)
-                    winner = Character.toString(BLACK);
-                else
-                    winner = "TIE";
-
-            } else {
-                switchPlayer();
-            }
-        }
-
-    }
-
-    private void switchPlayer() {
-        player = (player == BLACK) ? WHITE : BLACK;
-    }
-
-
-    private ArrayList<int[]> getListOfPiecesToFlip(int row, int col, int deltaRow, int deltaCol) {
-
-        ArrayList<int[]> piecesThatCanBeFlipped = new ArrayList<int[]>();
-
-        for (col += deltaCol, row += deltaRow ; board.isValidTile(row, col) ; col += deltaCol, row+= deltaRow) {
-
-            if (board.isEmptyTile(row, col)) {
-                piecesThatCanBeFlipped = new ArrayList<int[]>();
-                break;
-            } else if (occupiedByPlayer(row, col)) {
-                break;
-            }
-
-            piecesThatCanBeFlipped.add(new int[] {row, col});
-        }
-
-        if (!board.isValidTile(row, col))
-            piecesThatCanBeFlipped = new ArrayList<int[]>();
-
-        return piecesThatCanBeFlipped;
-
-    }
-
-    private boolean occupiedByPlayer(int row, int col) {
-        return (board.isValidTile(row, col) && (board.getBoard()[row][col] == player));
-    }
-
-
-    public ArrayList<int[]> getPossibleMoves() {
-        ArrayList<int[]> legalMoves = new ArrayList<int[]>();
-
-        for (int row = 0; row< board.getWidth(); row++)
-            for (int col = 0; col< board.getHeight(); col++)
-                if (isLegalMove(row,col))
-                    legalMoves.add(new int[] {row,col});
-
-
-        return legalMoves;
-    }
-
-    public boolean isLegalMove(int row, int col) {
-        if (!board.isEmptyTile(row, col))
-            return false;
-
-        for (int[] direction : ALL_DIRECTIONS)
-            if (!getListOfPiecesToFlip(row, col, direction[ROW], direction[COL]).isEmpty())
-                return true;
-
-        return false; // no pieces can flip
-    }
-
-
-    private void flipAllPieces(int row, int col) {
-
-        for (int[] direction : ALL_DIRECTIONS)
-            flipPieces(getListOfPiecesToFlip(row, col, direction[ROW], direction[COL]));
-
-        board.setTile(row, col, player);
-    }
-
-    private void flipPieces(ArrayList<int[]> piecesToFlip) {
-
-        for (int[] tile: piecesToFlip)
-            if (tile.length == 2)
-                board.setTile(tile[ROW], tile[COL], player);
-    }
-
-    public void countBoardPieces() {
-
-        whiteCount = blackCount = 0;
-
-        for (int row = 0; row < board.getWidth(); row++) {
-            for (int col = 0; col< board.getHeight(); col++) {
-                char piece = board.getTile(row, col);
-                if ( piece == WHITE)
-                    whiteCount++;
-
-                else if (piece == BLACK)
-                    blackCount++;
-            }
-        }
-    }
-
-    public char getCurrentPlayer() {
-        return player;
-    }
-
-
-
-    public void updatePlayer() {
-        setChanged();
-
-        notifyObservers("Black Count: " + blackCount +
-                "\nWhite Count: " + whiteCount +
-                "\nPlayer " + player + "'s turn");
-    }
-
-    public void undo() {
-        commandManager.undo();
-        updateBoard();
-        updatePlayer();
-    }
-
 }

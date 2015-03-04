@@ -11,7 +11,7 @@ public class ModelTest {
 
     @Before
     public void setUp() throws Exception {
-        model = new OthelloModel();
+//        model = new OthelloModel();
     }
 
 
