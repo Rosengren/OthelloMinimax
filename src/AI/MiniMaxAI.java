@@ -15,8 +15,6 @@ import java.util.Stack;
 public class MiniMaxAI {
 
     private static final int MAX_DEPTH = 3;
-    private static final int ROW = 0;
-    private static final int COLUMN = 1;
 
     private static final int BEST_ROW = 1;
     private static final int BEST_COL = 2;
@@ -42,11 +40,12 @@ public class MiniMaxAI {
         int[] bestOption;
 
         computer = game.getCurrentPlayer();
-        opponent = (computer == Field.BLACK) ? Field.WHITE : Field.BLACK;
+        opponent = game.getOpponentPlayer();
 
         bestOption = miniMax(MAX_DEPTH, computer);
 
-        game.move(bestOption[BEST_ROW], bestOption[BEST_COL]);
+        Position pos = new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
+        game.move(pos);
     }
 
 
@@ -63,7 +62,7 @@ public class MiniMaxAI {
         // computer is maximizing; while opponent is minimizing
         int bestScore = (player == computer) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int currentScore;
-        int[] bestTile = {-1,-1};
+        Position bestPosition = new Position(-1, -1);
 
         if (nextMoves.isEmpty() || depth == 0) {
             // Game over or depth reached, evaluate score
@@ -74,36 +73,31 @@ public class MiniMaxAI {
                 // push game to the stack and clone it
                 games.push(game);
                 game = (OthelloModel)game.clone();
-                System.out.println("Clonning board #" + games.size());
                 game.move(move);
-//                game.move(move[ROW], move[COLUMN]);
 
                 if (player == computer) {  // (computer) is maximizing player
-                    currentScore = miniMax(depth - 1, this.opponent)[ROW];
+                    currentScore = miniMax(depth - 1, this.opponent)[0];
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
-                        bestTile[ROW] = move.x; // [ROW];
-                        bestTile[COLUMN] = move.y; //[COLUMN];
-
+                        bestPosition = move;
                     }
+
                 } else {  // opponent is minimizing player
-                    currentScore = miniMax(depth - 1, computer)[ROW];
+                    currentScore = miniMax(depth - 1, computer)[0];
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
-                        bestTile[ROW] = move.x; // move[ROW];
-                        bestTile[COLUMN] = move.y; // [COLUMN];
+                        bestPosition = move;
                     }
                 }
 
                 // go to previous clone
                 if (!games.isEmpty()) {
-                    System.out.println("Popping clone #" + games.size());
                     game = games.pop();
                 }
             }
         }
 
-        return new int[] {bestScore, bestTile[ROW], bestTile[COLUMN]};
+        return new int[] {bestScore, bestPosition.x, bestPosition.y};
     }
 
 

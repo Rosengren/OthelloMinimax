@@ -162,6 +162,10 @@ public class OthelloModel extends Observable implements Cloneable {
         return currentPlayer;
     }
 
+    public Field getOpponentPlayer() {
+        return (currentPlayer == Field.WHITE) ? Field.BLACK : Field.WHITE;
+    }
+
     private int getNrOfIncludedPieces(Field player, Position pos, int xDir, int yDir) {
         int switches = 0;
         int opponentCount = 0;
