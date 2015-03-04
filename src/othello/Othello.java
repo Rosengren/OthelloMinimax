@@ -9,5 +9,6 @@ public class Othello {
 
         model.addObserver(view);
         view.addController(controller);
+        model.updateBoard();
     }
 }

@@ -17,20 +17,20 @@ public class Board {
     }
 
     public void setTile(int row, int col, char item) {
-        if (validTile(row, col)) {
+        if (isValidTile(row, col)) {
             board[row][col] = item;
         }
     }
 
     public char getTile(int row, int col) {
-        return (validTile(row, col)) ? board[row][col] : ' ';
+        return (isValidTile(row, col)) ? board[row][col] : ' ';
     }
 
     public boolean isEmptyTile(int row, int col) {
         return board[row][col] == ' ';
     }
 
-    private boolean validTile(int row, int col) {
+    public boolean isValidTile(int row, int col) {
         return row >= 0 && row < board.length
                 && col >= 0 && col < board[FIRST_ROW].length;
     }
