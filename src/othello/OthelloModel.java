@@ -108,8 +108,7 @@ public class OthelloModel extends Observable {
                 }
             }
 
-            // TODO: Change this next line for dealing with flipping pieces
-            nextBoardState[row][col] = 'W';
+            nextBoardState = model.makeMove(row, col);
             nextTurnState = true;
         }
 
@@ -150,8 +149,7 @@ public class OthelloModel extends Observable {
                 }
             }
 
-            // TODO: Change this for the Tile Flips
-            nextBoardState[row][col] = 'B';
+            nextBoardState = model.makeMove(row,col);
             nextTurnState = false;
         }
 
@@ -327,7 +325,7 @@ public class OthelloModel extends Observable {
         player = (player == BLACK) ? WHITE : BLACK;
     }
 
-    public void makeMove(int row, int col) {
+    public char[][] makeMove(int row, int col) {
 
         if (isLegalMove(row, col)) {
             flipAllPieces(row, col);
@@ -368,6 +366,8 @@ public class OthelloModel extends Observable {
             setChanged();
             notifyObservers("Invalid Move");
         }
+
+        return board.getBoard();
 
     }
 
@@ -413,5 +413,10 @@ public class OthelloModel extends Observable {
                 "\nPlayer " + player + "'s turn");
     }
 
+    public void undo() {
+        commandManager.undo();
+        updateBoard();
+        updatePlayer();
+    }
 
 }

@@ -22,7 +22,7 @@ public class View implements Observer {
     private static final int MESSAGE_TYPE = 0;
     private static final int MESSAGE = 1;
 
-    private static final int HEADER_HEIGHT = 20;
+    private static final int HEADER_HEIGHT = 50; // 20 if remove menu
     private static final int STATUS_BAR_HEIGHT = 50;
     private static final int WINDOW_WIDTH = 600;
     private static final int WINDOW_HEIGHT = 600 + HEADER_HEIGHT + STATUS_BAR_HEIGHT;
@@ -71,7 +71,7 @@ public class View implements Observer {
     public View() {
 
         initIconImages();
-//        initMenuBar();
+        initMenuBar();
         initScoreBoard();
         initBoardLayout();
         initMessageBoard();
@@ -282,7 +282,7 @@ public class View implements Observer {
         }
 
         // add redo/undo
-//        undo.addActionListener(controller);
+        undo.addActionListener(controller);
 //        redo.addActionListener(controller);
 
         // add save/load

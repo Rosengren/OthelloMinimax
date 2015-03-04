@@ -26,13 +26,16 @@ public class Controller implements ActionListener {
                 int row = Integer.parseInt(str[ROW]);
                 int col = Integer.parseInt(str[COL]);
 
-//                model.playMove(row, col);
+                model.playMove(row, col);
                 System.out.println("Play Move: " + row + "," + col);
-                model.makeMove(row, col);
+//                model.makeMove(row, col);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
+        } else if (e.getSource() instanceof JMenuItem) {
+
+            model.undo();
         }
     }
 }
