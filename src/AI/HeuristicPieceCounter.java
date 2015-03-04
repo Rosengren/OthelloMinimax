@@ -1,11 +1,11 @@
 package AI;
 
-import othello.OthelloModel;
+import othello.Field;
 
 public class HeuristicPieceCounter implements HeuristicStrategy {
 
-    private char computer;
-    private char opponent;
+    private Field computer;
+    private Field opponent;
 
     /**
      * constructor
@@ -14,8 +14,8 @@ public class HeuristicPieceCounter implements HeuristicStrategy {
      */
     public HeuristicPieceCounter() {
 
-        computer = 'W';
-        opponent = 'B';
+        computer = Field.WHITE;
+        opponent = Field.BLACK;
     }
 
 
@@ -24,18 +24,17 @@ public class HeuristicPieceCounter implements HeuristicStrategy {
      * of computer and opponent pieces on the board
      */
     @Override
-    public int evaluateBoard(OthelloModel game) {
+    public int evaluateBoard(Field[][] board) {
 
-        char[][] board = game.getBoard();
         int computerCount = 0;
         int opponentCount = 0;
 
 
-        for (int col = 0; col < board.length; col++) {
-            for (int row = 0; row < board[col].length; row++) {
-                if (board[col][row] == computer) {
+        for (Field[] row : board) {
+            for (Field tile : row) {
+                if (tile == computer) {
                     computerCount++;
-                } else if (board[col][row] == opponent) {
+                } else if (tile == opponent) {
                     opponentCount++;
                 }
             }

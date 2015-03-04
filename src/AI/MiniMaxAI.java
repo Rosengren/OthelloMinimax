@@ -66,7 +66,7 @@ public class MiniMaxAI {
 
         if (nextMoves.isEmpty() || depth == 0) {
             // Game over or depth reached, evaluate score
-            bestScore = evaluate.evaluateBoard(game);
+            bestScore = evaluate.evaluateBoard(game.getBoard().getBoard());
         } else {
             for (Position move : nextMoves) {
                 // Try this move for the current "player"

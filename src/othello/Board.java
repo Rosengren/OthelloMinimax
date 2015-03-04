@@ -2,65 +2,66 @@ package othello;
 
 public class Board {
 
-    private static final int FIRST_ROW = 0;
+    public int width;
+    public int height;
+    public String situation;
+    private Field[][] board;
 
-    private char[][] board;
-
-    public Board(int rows, int cols) {
-        board = new char[rows][cols];
+    public Board(int width, int height) {
+        board = new Field[width][height];
+        this.width = width;
+        this.height = height;
+        hardCodedInitialBoard();
     }
 
-    public void reset() {
-        for (int row = 0; row < board.length; row++)
-            for (int col = 0; col < board[row].length; col++)
-                board[row][col] = ' ';
+    public Board(int width, int height, String situation) {
+        this(width, height);
+        this.situation = situation;
     }
 
-    public void setTile(int row, int col, char item) {
-        if (isValidTile(row, col)) {
-            board[row][col] = item;
-        }
+    public void hardCodedInitialBoard() { // TODO: replace this
+        board[3][3] = Field.WHITE;
+        board[4][4] = Field.WHITE;
+        board[3][4] = Field.BLACK;
+        board[4][3] = Field.BLACK;
     }
 
-    public char getTile(int row, int col) {
-        return (isValidTile(row, col)) ? board[row][col] : ' ';
+    public void set(int x, int y, Field f) {
+        board[x][y] = f;
     }
 
-    public boolean isEmptyTile(int row, int col) {
-        return board[row][col] == ' ';
+    public Field get(int x, int y) {
+        return board[x][y];
     }
 
-    public boolean isValidTile(int row, int col) {
-        return row >= 0 && row < board.length
-                && col >= 0 && col < board[FIRST_ROW].length;
+    public void set(Position pos, Field f) {
+        board[pos.x][pos.y] = f;
     }
 
-    public char[][] getBoard() {
-        return board;
+    public Field get(Position pos) {
+        return board[pos.x][pos.y];
     }
 
-    public void printBoard() {
-        String result = "";
+    public boolean isPositionOnBoard(Position pos) {
+        return pos.x < width && pos.y < height && pos.x >= 0 && pos.y >= 0;
+    }
 
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[row].length; col++) {
-                result += board[row][col] + " ";
+    public Field[][] getBoard() {
+        Field[][] clonedBoard = new Field[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (board[x][y] == null) {
+                    clonedBoard[x][y] = Field.HOLE;
+                } else if (board[x][y] == Field.BLACK) {
+                    clonedBoard[x][y] = Field.BLACK;
+                } else if (board[x][y] == Field.WHITE) {
+                    clonedBoard[x][y] = Field.WHITE;
+                } else if (board[x][y] == Field.HOLE) {
+                    clonedBoard[x][y] = Field.HOLE;
+                }
             }
-            result += "\n";
         }
 
-        System.out.println(result);
-    }
-
-    public void setBoard(char[][] newBoard) {
-        board = newBoard;
-    }
-
-    public int getHeight() {
-        return (board == null) ? -1 : board[FIRST_ROW].length;
-    }
-
-    public int getWidth() {
-        return (board == null) ? -1 : board.length;
+        return clonedBoard;
     }
 }

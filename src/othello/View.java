@@ -222,12 +222,12 @@ public class View implements Observer {
      * @param row: y coordinate
      * @param col: x coordinate
      */
-    public void displayPiece(int row, int col, char color) {
-        if (color == 'B')
+    public void displayPiece(int row, int col, Field color) {
+        if (color == Field.BLACK)
             tiles[row][col].setIcon(new ImageIcon(blackDisc));
-        else if (color == 'W')
+        else if (color == Field.WHITE)
             tiles[row][col].setIcon(new ImageIcon(whiteDisc));
-        else if (color == ' ')
+        else if (color == Field.HOLE)
             tiles[row][col].setIcon(null);
     }
 
@@ -258,7 +258,8 @@ public class View implements Observer {
      * @param board: grid to be redrawn
      */
     public void redrawBoard(Board board) {
-        char[][] grid = board.getBoard();
+        System.out.println("REDRAWING BOARD");
+        Field[][] grid = board.getBoard();
 
         int white = 0;
         int black = 0;
@@ -266,9 +267,9 @@ public class View implements Observer {
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
 
-                if (grid[i][j] == 'W')  {
+                if (grid[i][j] == Field.WHITE)  {
                     white++;
-                } else if (grid[i][j] == 'B') {
+                } else if (grid[i][j] == Field.BLACK) {
                     black++;
                 }
 
@@ -331,10 +332,6 @@ public class View implements Observer {
         if (arg instanceof String) {
             displayMessage((String)arg);
 
-        } else if (arg instanceof Board) {
-            Board board = (Board)arg;
-
-            redrawBoard(board);
         } else if (arg instanceof String[]) {
             String[] message = (String[])arg;
 
@@ -345,10 +342,8 @@ public class View implements Observer {
                     displayMessage(message[MESSAGE]);
                 }
             }
-        } else if (arg instanceof char[][]) {
-            char[][] b = (char[][])arg;
-            Board board = new Board(b.length, b[0].length);
-            board.setBoard(b);
+        } else if (arg instanceof Board) {
+            Board board = (Board)arg;
             redrawBoard(board);
         }
     }

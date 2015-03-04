@@ -28,18 +28,18 @@ public class OthelloModel extends Observable implements Cloneable {
 
     private boolean submittedMove = false;
 
-    public NewBoard board;
+    public Board board;
 
     private final int[][] adjacentFields = {{-1, -1}, {0, -1}, {1, -1},
             {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
 
     public OthelloModel(int width, int height) {
-        board = new NewBoard(width, height);
+        board = new Board(width, height);
         checkState();
     }
 
     public OthelloModel(int width, int height, String situation) {
-        board = new NewBoard(width, height, situation);
+        board = new Board(width, height, situation);
         checkState();
     }
 
@@ -289,8 +289,8 @@ public class OthelloModel extends Observable implements Cloneable {
         return true;
     }
 
-    public void setBoard(NewBoard newBoard) {
-        board = newBoard;
+    public void setBoard(Board board) {
+        this.board = board;
     }
 
     public boolean wasMoveSubmitted() {
@@ -309,17 +309,17 @@ public class OthelloModel extends Observable implements Cloneable {
 
     public void updateBoard() {
         setChanged();
-        notifyObservers(board.getBoard());
+        notifyObservers(board);
     }
 
-    public char[][] getBoard() {
-        return board.getBoard();
+    public Board getBoard() {
+        return board;
     }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
         try {
-            NewBoard clonedBoard = new NewBoard(board.width, board.height);
+            Board clonedBoard = new Board(board.width, board.height);
             for (int x = 0; x < board.width; x++) {
                 for (int y = 0; y < board.height; y++) {
                     clonedBoard.set(x, y, board.get(x, y));

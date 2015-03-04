@@ -1,8 +1,8 @@
 package AI;
 
-import othello.OthelloModel;
+import othello.Field;
 
 public interface HeuristicStrategy {
 
-    public int evaluateBoard(OthelloModel game);
+    public int evaluateBoard(Field[][] board);
 }
