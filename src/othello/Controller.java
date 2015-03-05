@@ -27,7 +27,6 @@ public class Controller implements ActionListener {
 
             while(model.isRunning()) {
                 ai.playTurn(model);
-                System.out.println("Player: " + model.getCurrentPlayer());
             }
 
             System.out.println("DONE");

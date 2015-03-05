@@ -30,8 +30,8 @@ public class View implements Observer {
     private static final String BLACK_DISC_FILE_PATH = "../images/black_piece.png";
     private static final String WHITE_DISC_FILE_PATH = "../images/white_piece.png";
 
-    private static final Color LIGHT_COLORED_TILE = new Color(43, 209, 115);
-    private static final Color DARK_COLORED_TILE = new Color(42, 159, 93);
+    private static final Color LIGHT_COLORED_TILE = new Color(56,122,54);
+    private static final Color DARK_COLORED_TILE = new Color(35,80,33);
 
     private static final int BOARD_WIDTH = 8;
     private static final int BOARD_HEIGHT = 8;

@@ -141,7 +141,6 @@ public class OthelloModel extends Observable implements Cloneable {
             if (!isMovePossible(getCurrentPlayer())) {
                 Field nextPlayer = getWaitingPlayer();
                 if (isMovePossible(nextPlayer)) {
-                    System.out.println("Playing same player (" + currentPlayer + ") again");
                     nextPlayer();
                     returnCode = 1;
                 } else {

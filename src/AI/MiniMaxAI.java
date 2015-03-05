@@ -45,12 +45,7 @@ public class MiniMaxAI {
         bestOption = miniMax(MAX_DEPTH, computer);
 
         Position pos = new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
-        if (pos.x == -1 && pos.y == -1) {
-            System.out.println("POSITION -1,-1");
-            game.nextPlayer();
-        } else {
-            game.move(pos);
-        }
+        game.move(pos);
     }
 
 
