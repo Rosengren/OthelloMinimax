@@ -19,11 +19,9 @@ public class Board {
         this.situation = situation;
     }
 
-    public void hardCodedInitialBoard() { // TODO: replace this
-        board[3][3] = Field.WHITE;
-        board[4][4] = Field.WHITE;
-        board[3][4] = Field.BLACK;
-        board[4][3] = Field.BLACK;
+    public void hardCodedInitialBoard() {
+        board[3][3] = board[4][4] = Field.WHITE;
+        board[3][4] = board[4][3] = Field.BLACK;
     }
 
     public void set(int x, int y, Field f) {
@@ -48,9 +46,10 @@ public class Board {
 
     public Field[][] getBoard() {
         Field[][] clonedBoard = new Field[width][height];
+
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (board[x][y] == null) {
+                if (board[x][y] == null || board[x][y] == null) {
                     clonedBoard[x][y] = Field.HOLE;
                 } else if (board[x][y] == Field.BLACK) {
                     clonedBoard[x][y] = Field.BLACK;

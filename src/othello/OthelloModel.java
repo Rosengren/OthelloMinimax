@@ -103,7 +103,7 @@ public class OthelloModel extends Observable implements Cloneable {
         return isMovePositionValid;
     }
 
-    private void nextPlayer() {
+    public void nextPlayer() {
         if (!isRunning)
             throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
 
@@ -141,6 +141,7 @@ public class OthelloModel extends Observable implements Cloneable {
             if (!isMovePossible(getCurrentPlayer())) {
                 Field nextPlayer = getWaitingPlayer();
                 if (isMovePossible(nextPlayer)) {
+                    System.out.println("Playing same player (" + currentPlayer + ") again");
                     nextPlayer();
                     returnCode = 1;
                 } else {
@@ -297,6 +298,22 @@ public class OthelloModel extends Observable implements Cloneable {
         return submittedMove;
     }
 
+    public int[] getScore() {
+
+        int[] score = new int[2];
+
+        for (Field[] row : board.getBoard()) {
+            for (Field tile : row) {
+                if (tile == Field.BLACK)
+                    score[0]++;
+                else if (tile == Field.WHITE)
+                    score[1]++;
+            }
+        }
+
+        return score;
+    }
+
     public int[] abortGame() {
         int[] result = getResult();
         setFinished();
@@ -318,20 +335,15 @@ public class OthelloModel extends Observable implements Cloneable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        try {
-            Board clonedBoard = new Board(board.width, board.height);
-            for (int x = 0; x < board.width; x++) {
-                for (int y = 0; y < board.height; y++) {
-                    clonedBoard.set(x, y, board.get(x, y));
-                }
-            }
-            OthelloModel cloned = (OthelloModel)super.clone();
-            cloned.setBoard(clonedBoard);
-            return cloned;
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
 
-        return null; // TODO: FIX THIS
+        Board clonedBoard = new Board(board.width, board.height);
+        for (int x = 0; x < board.width; x++)
+            for (int y = 0; y < board.height; y++)
+                clonedBoard.set(x, y, board.get(x, y)); // Deep Clone
+
+        OthelloModel cloned = (OthelloModel)super.clone();
+        cloned.setBoard(clonedBoard);
+
+        return cloned;
     }
 }

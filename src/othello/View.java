@@ -22,7 +22,7 @@ public class View implements Observer {
     private static final int MESSAGE_TYPE = 0;
     private static final int MESSAGE = 1;
 
-    private static final int HEADER_HEIGHT = 20; // 20 if remove menu
+    private static final int HEADER_HEIGHT = 20;
     private static final int STATUS_BAR_HEIGHT = 50;
     private static final int WINDOW_WIDTH = 600;
     private static final int WINDOW_HEIGHT = 600 + HEADER_HEIGHT + STATUS_BAR_HEIGHT;
@@ -258,7 +258,6 @@ public class View implements Observer {
      * @param board: grid to be redrawn
      */
     public void redrawBoard(Board board) {
-        System.out.println("REDRAWING BOARD");
         Field[][] grid = board.getBoard();
 
         int white = 0;

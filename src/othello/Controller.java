@@ -17,19 +17,26 @@ public class Controller implements ActionListener {
         this.model = model;
     }
 
-    public void playMove(int row, int col) {
+    public void playMove(Position pos) {
 
         MiniMaxAI ai = new MiniMaxAI();
 
         try {
-            model.move(row, col);
-            ai.playTurn(model);
+//            model.move(pos);
+//            ai.playTurn(model);
+
+            while(model.isRunning()) {
+                ai.playTurn(model);
+                System.out.println("Player: " + model.getCurrentPlayer());
+            }
+
+            System.out.println("DONE");
+
+            int[] score = model.getScore();
+            System.out.println("Score: Black = " + score[0] + ", White = " + score[1]);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("Play Move: " + row + "," + col);
-//                model.makeMove(row, col);
     }
 
     @Override
@@ -40,10 +47,11 @@ public class Controller implements ActionListener {
 
             try {
                 String[] str = userInput.split(",");
-                int row = Integer.parseInt(str[ROW]);
-                int col = Integer.parseInt(str[COL]);
+                int x = Integer.parseInt(str[ROW]);
+                int y = Integer.parseInt(str[COL]);
 
-                playMove(row, col);
+                Position playerMove = new Position(x, y);
+                playMove(playerMove);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

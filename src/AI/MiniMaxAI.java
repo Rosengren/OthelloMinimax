@@ -45,7 +45,12 @@ public class MiniMaxAI {
         bestOption = miniMax(MAX_DEPTH, computer);
 
         Position pos = new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
-        game.move(pos);
+        if (pos.x == -1 && pos.y == -1) {
+            System.out.println("POSITION -1,-1");
+            game.nextPlayer();
+        } else {
+            game.move(pos);
+        }
     }
 
 
@@ -57,43 +62,43 @@ public class MiniMaxAI {
      */
     private int[] miniMax(int depth, Field player) throws CloneNotSupportedException {
 
-        List<Position> nextMoves = game.getPossibleMoves(player);
-
         // computer is maximizing; while opponent is minimizing
         int bestScore = (player == computer) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int currentScore;
         Position bestPosition = new Position(-1, -1);
 
-        if (nextMoves.isEmpty() || depth == 0) {
+        if (!game.isRunning() || depth == 0) {
             // Game over or depth reached, evaluate score
             bestScore = evaluate.evaluateBoard(game.getBoard().getBoard());
         } else {
-            for (Position move : nextMoves) {
+
+            List<Position> nextMoves = game.getPossibleMoves(player);
+
+            for (Position position : nextMoves) {
                 // Try this move for the current "player"
                 // push game to the stack and clone it
                 games.push(game);
                 game = (OthelloModel)game.clone();
-                game.move(move);
+                game.move(position);
 
-                if (player == computer) {  // (computer) is maximizing player
+                if (player == computer) {  // computer is maximizing player
                     currentScore = miniMax(depth - 1, this.opponent)[0];
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
-                        bestPosition = move;
+                        bestPosition = position;
                     }
 
                 } else {  // opponent is minimizing player
                     currentScore = miniMax(depth - 1, computer)[0];
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
-                        bestPosition = move;
+                        bestPosition = position;
                     }
                 }
 
                 // go to previous clone
-                if (!games.isEmpty()) {
+                if (!games.isEmpty())
                     game = games.pop();
-                }
             }
         }
 
