@@ -19,13 +19,9 @@ import java.util.Observer;
  */
 public class View implements Observer {
 
-    private static final int MESSAGE_TYPE = 0;
-    private static final int MESSAGE = 1;
-
     private static final int HEADER_HEIGHT = 20;
-    private static final int STATUS_BAR_HEIGHT = 50;
     private static final int WINDOW_WIDTH = 600;
-    private static final int WINDOW_HEIGHT = 600 + HEADER_HEIGHT + STATUS_BAR_HEIGHT;
+    private static final int WINDOW_HEIGHT = 600 + HEADER_HEIGHT;
     private static final int ICON_WIDTH = 50;
     private static final int ICON_HEIGHT = 50;
 
@@ -44,12 +40,10 @@ public class View implements Observer {
 
     private JPanel boardPanel;
     private JPanel scorePanel;
-    private JPanel messagePanel;
 
     private JLabel scoreField;
     private JLabel blackScore;
     private JLabel whiteScore;
-    private JLabel informationField;
 
     private JButton[][] tiles;
 
@@ -68,7 +62,6 @@ public class View implements Observer {
         initIconImages();
         initScoreBoard();
         initBoardLayout();
-        initMessageBoard();
         initWindow();
     }
 
@@ -184,18 +177,6 @@ public class View implements Observer {
         return button;
     }
 
-
-    /**
-     * initialize message board at
-     * the bottom of the window
-     */
-    private void initMessageBoard() {
-        messagePanel = new JPanel();
-        informationField = new JLabel(" ");
-        messagePanel.add(informationField);
-    }
-
-
     /**
      * initialize window properties
      * and set it to visible
@@ -208,7 +189,6 @@ public class View implements Observer {
 
         window.add(scorePanel, BorderLayout.NORTH);
         window.add(boardPanel, BorderLayout.CENTER);
-        window.add(messagePanel, BorderLayout.SOUTH);
         window.add(boardPanel);
         window.pack();
         window.setVisible(true);
@@ -312,15 +292,6 @@ public class View implements Observer {
         return opt;
     }
 
-
-    /**
-     * print message at the bottom of the game window
-     */
-    public void displayMessage(String message) {
-        informationField.setText(message);
-    }
-
-
     /**
      * update the board and display message
      * when the game model has changed
@@ -329,18 +300,8 @@ public class View implements Observer {
     public void update(Observable o, Object arg) {
 
         if (arg instanceof String) {
-            displayMessage((String)arg);
+            displayWinner((String)arg);
 
-        } else if (arg instanceof String[]) {
-            String[] message = (String[])arg;
-
-            if (message.length == 2) {
-                if (message[MESSAGE_TYPE].equals("game over")) {
-                    displayWinner(message[MESSAGE]);
-                } else if (message[MESSAGE_TYPE].equals("error")) {
-                    displayMessage(message[MESSAGE]);
-                }
-            }
         } else if (arg instanceof Board) {
             Board board = (Board)arg;
             redrawBoard(board);
