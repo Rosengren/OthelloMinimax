@@ -12,7 +12,7 @@ import java.util.Stack;
  * @author mitchcail / Kevin Rosengren
  *
  */
-public class MiniMaxAI {
+public class MiniMaxAI implements AI {
 
     private static final int MAX_DEPTH = 3;
 
@@ -27,15 +27,16 @@ public class MiniMaxAI {
     protected Field computer;
     protected Field opponent;
 
-    public void setStrategy() {
-        evaluate = new HeuristicPieceCounter();
+    @Override
+    public void setStrategy(HeuristicStrategy strategy) {
+        evaluate = strategy;
     }
 
+    @Override
     public void playTurn(OthelloModel game) throws CloneNotSupportedException {
 
         games = new Stack<OthelloModel>();
         this.game = (OthelloModel)game.clone();
-        setStrategy();
 
         int[] bestOption;
 
