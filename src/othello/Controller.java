@@ -1,9 +1,6 @@
 package othello;
 
-import AI.AI;
-import AI.HeuristicPieceCounter;
-import AI.MiniMaxAI;
-
+import AI.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,16 +18,17 @@ public class Controller implements ActionListener {
 
     public void playMove(Position pos) {
 
-        AI ai = new MiniMaxAI();
+//        AI ai = new MiniMaxAI();
+        AI ai = new MiniMaxAlphaBetaAI();
         ai.setStrategy(new HeuristicPieceCounter());
 
         try {
-//            model.move(pos);
-//            ai.playTurn(model);
+            model.move(pos);
+            ai.playTurn(model);
 
-            while(model.isRunning()) {
-                ai.playTurn(model);
-            }
+//            while(model.isRunning()) {
+//                ai.playTurn(model);
+//            }
 
             System.out.println("DONE");
 
