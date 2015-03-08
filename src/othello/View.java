@@ -281,7 +281,7 @@ public class View extends JFrame implements Observer {
      */
     @Override
     public void update(Observable o, Object arg) {
-
+        requestFocusInWindow();
         if (arg instanceof String) {
             displayWinner((String)arg);
 

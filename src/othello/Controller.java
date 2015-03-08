@@ -10,10 +10,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Controller implements ActionListener {
 
     private static final int TIME_BETWEEN_MOVES = 1000;
+    private static final int DELAY = 50;
+
+    private Queue<Position> queue;
 
     private static final int ROW = 0;
     private static final int COL = 1;
@@ -29,31 +34,25 @@ public class Controller implements ActionListener {
         miniMaxAI = new MiniMaxAI();
         miniMaxAlphaBetaAI = new MiniMaxAlphaBetaAI();
         keyPress = new TAdapter();
+        queue = new LinkedList<Position>();
+        setTimer();
+
     }
 
     public KeyAdapter getKeyListener() {
         return keyPress;
     }
 
-    public void playMove(Position pos) {
 
-        AI ai2 = new MiniMaxAI();
-        ai2.setStrategy(new HeuristicPieceCounter());
-        AI ai = new MiniMaxAlphaBetaAI();
-        ai.setStrategy(new HeuristicPieceCounter());
+    private void setTimer() {
+        Timer timer = new Timer(DELAY, this);
+        timer.start();
+    }
+
+    public void playMove(Position pos) {
 
         try {
             model.move(pos);
-            ai.playTurn(model);
-
-//            while(model.isRunning()) {
-//                ai.playTurn(model);
-//                ai2.playTurn(model);
-
-//            }
-
-            System.out.println("DONE");
-
             int[] score = model.getScore();
             System.out.println("Score: Black = " + score[0] + ", White = " + score[1]);
         } catch (Exception e) {
@@ -78,29 +77,25 @@ public class Controller implements ActionListener {
                     case KeyEvent.VK_ESCAPE:
                         return;
                     case KeyEvent.VK_1:
-                        miniMaxAI.playTurn(model);
+                        playMove(miniMaxAI.selectMove(model));
                         return;
                     case KeyEvent.VK_2:
-                        miniMaxAlphaBetaAI.playTurn(model);
+                        playMove(miniMaxAlphaBetaAI.selectMove(model));
                         return;
                     case KeyEvent.VK_3:
                         while (model.isRunning()) {
-                            miniMaxAI.playTurn(model);
-                            Thread.sleep(TIME_BETWEEN_MOVES);
+                            playMove(miniMaxAI.selectMove(model));
                         }
                         return;
                     case KeyEvent.VK_4:
                         while (model.isRunning()) {
-                            miniMaxAlphaBetaAI.playTurn(model);
-                            Thread.sleep(TIME_BETWEEN_MOVES);
+                            playMove(miniMaxAlphaBetaAI.selectMove(model));
                         }
                         return;
                     case KeyEvent.VK_5:
                         while (model.isRunning()) {
-                            miniMaxAI.playTurn(model);
-                            Thread.sleep(TIME_BETWEEN_MOVES);
-                            miniMaxAlphaBetaAI.playTurn(model);
-                            Thread.sleep(TIME_BETWEEN_MOVES);
+                            miniMaxAI.selectMove(model);
+                            miniMaxAlphaBetaAI.selectMove(model);
                         }
                         return;
                     case KeyEvent.VK_6:
@@ -124,6 +119,9 @@ public class Controller implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+//        System.out.println("Move Made!");
+
         if(e.getSource() instanceof JButton) {
 
             String userInput = e.getActionCommand();
@@ -139,6 +137,11 @@ public class Controller implements ActionListener {
                 ex.printStackTrace();
             }
 
+        } else {
+            if (!queue.isEmpty()) {
+                model.move(queue.remove());
+                model.updateBoard();
+            }
         }
     }
 }

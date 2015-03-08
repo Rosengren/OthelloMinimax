@@ -39,7 +39,7 @@ public class MiniMaxAI implements AI {
     }
 
     @Override
-    public void playTurn(OthelloModel game) throws CloneNotSupportedException {
+    public Position selectMove(OthelloModel game) throws CloneNotSupportedException {
 
         totalNodesVisited = 0;
         games = new Stack<OthelloModel>();
@@ -52,10 +52,8 @@ public class MiniMaxAI implements AI {
 
         bestOption = miniMax(MAX_DEPTH, computer);
 
-        Position pos = new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
-        game.move(pos);
-
-        System.out.println("Nodes Visited: " + totalNodesVisited);
+        System.out.println("Nodes Visited (MiniMax): " + totalNodesVisited);
+        return new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
     }
 
 
