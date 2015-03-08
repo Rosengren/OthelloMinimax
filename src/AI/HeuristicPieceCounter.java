@@ -14,10 +14,17 @@ public class HeuristicPieceCounter implements HeuristicStrategy {
      */
     public HeuristicPieceCounter() {
 
+        // default
         computer = Field.WHITE;
         opponent = Field.BLACK;
     }
 
+
+    @Override
+    public void setComputerAndOpponent(Field computer, Field opponent) {
+        this.computer = computer;
+        this.opponent = opponent;
+    }
 
     /**
      * evaluate the board by determining the ratio

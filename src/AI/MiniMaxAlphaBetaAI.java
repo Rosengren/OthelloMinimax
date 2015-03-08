@@ -43,6 +43,7 @@ public class MiniMaxAlphaBetaAI implements AI {
 
         computer = game.getCurrentPlayer();
         opponent = game.getOpponentPlayer();
+        evaluate.setComputerAndOpponent(computer, opponent);
 
         bestOption = miniMax(MAX_DEPTH, computer, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
@@ -79,13 +80,13 @@ public class MiniMaxAlphaBetaAI implements AI {
 
                 if (player == computer) {  // mySeed (computer) is maximizing player
                     score = miniMax(depth - 1, opponent, alpha, beta)[0];
-                    if (score > alpha) {
+                    if (score >= alpha) {
                         alpha = score;
                         bestPosition = position;
                     }
                 } else {  // oppSeed is minimizing player
                     score = miniMax(depth - 1, computer, alpha, beta)[0];
-                    if (score < beta) {
+                    if (score <= beta) {
                         beta = score;
                         bestPosition = position;
                     }

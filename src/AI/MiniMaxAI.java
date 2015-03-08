@@ -49,6 +49,7 @@ public class MiniMaxAI implements AI {
 
         computer = game.getCurrentPlayer();
         opponent = game.getOpponentPlayer();
+        evaluate.setComputerAndOpponent(computer, opponent);
 
         bestOption = miniMax(MAX_DEPTH, computer);
 
@@ -90,14 +91,14 @@ public class MiniMaxAI implements AI {
                 totalNodesVisited++;
                 if (player == computer) {  // computer is maximizing player
                     currentScore = miniMax(depth - 1, this.opponent)[0];
-                    if (currentScore > bestScore) {
+                    if (currentScore >= bestScore) {
                         bestScore = currentScore;
                         bestPosition = position;
                     }
 
                 } else {  // opponent is minimizing player
                     currentScore = miniMax(depth - 1, computer)[0];
-                    if (currentScore < bestScore) {
+                    if (currentScore <= bestScore) {
                         bestScore = currentScore;
                         bestPosition = position;
                     }
