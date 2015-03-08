@@ -46,11 +46,15 @@ public class MiniMaxAlphaBetaAI implements AI {
 
         bestOption = miniMax(MAX_DEPTH, computer, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-        System.out.println("Nodes Visited (MiniMax with Pruning): " + totalNodesVisited);
         return new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
     }
 
-    /** Minimax (recursive) at level of depth for maximizing or minimizing player
+    @Override
+    public int getNumOfPositionsVisitedLastMove() {
+        return totalNodesVisited;
+    }
+
+    /** MiniMax (recursive) at level of depth for maximizing or minimizing player
      with alpha-beta cut-off. Return int[3] of {score, row, col}  */
     private int[] miniMax(int depth, Field player, int alpha, int beta) throws CloneNotSupportedException {
 

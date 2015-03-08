@@ -71,7 +71,6 @@ public class Controller implements ActionListener {
                 switch(key) {
                     case KeyEvent.VK_ENTER:
                         model.resetGame();
-
                         return;
                     case KeyEvent.VK_SPACE:
                         return;
@@ -79,9 +78,11 @@ public class Controller implements ActionListener {
                         return;
                     case KeyEvent.VK_1:
                         playMove(miniMaxAI.selectMove(model));
+                        System.out.println("Nodes Visited (MiniMax): " + miniMaxAI.getNumOfPositionsVisitedLastMove());
                         return;
                     case KeyEvent.VK_2:
                         playMove(miniMaxAlphaBetaAI.selectMove(model));
+                        System.out.println("Nodes Visited (MiniMax Alpha-Beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         return;
                     case KeyEvent.VK_3:
                         while (model.isRunning()) {

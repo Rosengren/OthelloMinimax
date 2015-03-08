@@ -52,8 +52,12 @@ public class MiniMaxAI implements AI {
 
         bestOption = miniMax(MAX_DEPTH, computer);
 
-        System.out.println("Nodes Visited (MiniMax): " + totalNodesVisited);
         return new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
+    }
+
+    @Override
+    public int getNumOfPositionsVisitedLastMove() {
+        return totalNodesVisited;
     }
 
 
