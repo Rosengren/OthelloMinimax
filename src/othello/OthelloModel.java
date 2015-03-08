@@ -22,11 +22,12 @@ public class OthelloModel extends Observable implements Cloneable {
             + "like A1:B3 or A1:A1. The first position has to be on the"
             + "top left.";
 
-    private Field currentPlayer = Field.BLACK;
+    private Field currentPlayer;
 
-    private boolean isRunning = true;
+    private boolean isRunning;
+    private boolean submittedMove;
 
-    private boolean submittedMove = false;
+    private int width, height;
 
     public Board board;
 
@@ -34,13 +35,18 @@ public class OthelloModel extends Observable implements Cloneable {
             {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
 
     public OthelloModel(int width, int height) {
-        board = new Board(width, height);
-        checkState();
+        this.width = width;
+        this.height = height;
+        resetGame();
     }
 
-    public OthelloModel(int width, int height, String situation) {
-        board = new Board(width, height, situation);
+    public void resetGame() {
+        board = new Board(width, height);
+        currentPlayer = Field.BLACK;
+        isRunning = true;
+        submittedMove = false;
         checkState();
+        updateBoard();
     }
 
     private void checkState() {
@@ -108,10 +114,6 @@ public class OthelloModel extends Observable implements Cloneable {
             throw new IllegalStateException(ERR_NO_ACTIVE_GAME);
 
         currentPlayer = (currentPlayer == Field.BLACK) ? Field.WHITE : Field.BLACK;
-    }
-
-    public int move(int row, int col) {
-        return move(new Position(row, col));
     }
 
     public int move(Position pos) {

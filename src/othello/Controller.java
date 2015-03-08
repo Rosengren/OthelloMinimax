@@ -70,7 +70,8 @@ public class Controller implements ActionListener {
             try {
                 switch(key) {
                     case KeyEvent.VK_ENTER:
-                        // restart game here
+                        model.resetGame();
+
                         return;
                     case KeyEvent.VK_SPACE:
                         return;
