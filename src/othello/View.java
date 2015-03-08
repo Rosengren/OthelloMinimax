@@ -17,7 +17,7 @@ import java.util.Observer;
  * @author kevinrosengren
  *
  */
-public class View implements Observer {
+public class View extends JFrame implements Observer {
 
     private static final int HEADER_HEIGHT = 20;
     private static final int WINDOW_WIDTH = 600;
@@ -35,8 +35,6 @@ public class View implements Observer {
 
     private static final int BOARD_WIDTH = 8;
     private static final int BOARD_HEIGHT = 8;
-
-    private JFrame window;
 
     private JPanel boardPanel;
     private JPanel scorePanel;
@@ -80,7 +78,7 @@ public class View implements Observer {
 
         } catch (Exception e) {
             System.out.println("Could not load icon images");
-            JOptionPane.showMessageDialog(window, "Error: The game could not locate the images:\n\n\t\t\t\t" + BLACK_DISC_FILE_PATH
+            JOptionPane.showMessageDialog(this, "Error: The game could not locate the images:\n\n\t\t\t\t" + BLACK_DISC_FILE_PATH
                             + "\n\t\t\t\t" + WHITE_DISC_FILE_PATH + "\n\nExiting Application.",
                     "Error Loading Images", JOptionPane.INFORMATION_MESSAGE);
 
@@ -182,16 +180,18 @@ public class View implements Observer {
      * and set it to visible
      */
     private void initWindow() {
-        window = new JFrame(OTHELLO_TITLE);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        window.setResizable(false);
+        setTitle(OTHELLO_TITLE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setFocusable(true);
 
-        window.add(scorePanel, BorderLayout.NORTH);
-        window.add(boardPanel, BorderLayout.CENTER);
-        window.add(boardPanel);
-        window.pack();
-        window.setVisible(true);
+        add(scorePanel, BorderLayout.NORTH);
+        add(boardPanel, BorderLayout.CENTER);
+        add(boardPanel);
+        pack();
+        setVisible(true);
     }
 
 
@@ -260,7 +260,7 @@ public class View implements Observer {
         whiteScore.setText("White: " + white);
         blackScore.setText("Black: " + black);
 
-        window.repaint();
+        repaint();
     }
 
 
@@ -269,27 +269,10 @@ public class View implements Observer {
      */
     public void displayWinner(String winner) {
         scoreField.setText("The Winner is: " + winner);
-        JOptionPane.showMessageDialog(window, "The Winner is: " + winner,
+        JOptionPane.showMessageDialog(this, "The Winner is: " + winner,
                 "Game Over", JOptionPane.INFORMATION_MESSAGE);
 
         close();
-    }
-
-
-    /**
-     * Prompt user to select an AI
-     * @param options : string array of AI options
-     * @return the option selected by the user or
-     * 			-1 if the user cancels the prompt
-     */
-    public int selectAI(String[] options) {
-
-        int opt = JOptionPane.showOptionDialog(window,
-                "Which strategy would you like the computer to play?",
-                "Choose AI Strategy", JOptionPane.DEFAULT_OPTION,
-                JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-
-        return opt;
     }
 
     /**
@@ -309,7 +292,7 @@ public class View implements Observer {
     }
 
     public void close() {
-        window.dispose();
+        dispose();
         System.exit(0); // EXIT STATUS 0
     }
 }

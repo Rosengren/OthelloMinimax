@@ -21,11 +21,17 @@ public class MiniMaxAI implements AI {
 
     private OthelloModel game;
 
-    protected Stack<OthelloModel> games;
-    protected HeuristicStrategy evaluate;
+    private Stack<OthelloModel> games;
+    private HeuristicStrategy evaluate;
 
-    protected Field computer;
-    protected Field opponent;
+    private Field computer;
+    private Field opponent;
+
+    private int totalNodesVisited;
+
+    public MiniMaxAI() {
+        evaluate = new HeuristicPieceCounter(); // default strategy
+    }
 
     @Override
     public void setStrategy(HeuristicStrategy strategy) {
@@ -35,6 +41,7 @@ public class MiniMaxAI implements AI {
     @Override
     public void playTurn(OthelloModel game) throws CloneNotSupportedException {
 
+        totalNodesVisited = 0;
         games = new Stack<OthelloModel>();
         this.game = (OthelloModel)game.clone();
 
@@ -47,6 +54,8 @@ public class MiniMaxAI implements AI {
 
         Position pos = new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
         game.move(pos);
+
+        System.out.println("Nodes Visited: " + totalNodesVisited);
     }
 
 
@@ -76,7 +85,7 @@ public class MiniMaxAI implements AI {
                 games.push(game);
                 game = (OthelloModel)game.clone();
                 game.move(position);
-
+                totalNodesVisited++;
                 if (player == computer) {  // computer is maximizing player
                     currentScore = miniMax(depth - 1, this.opponent)[0];
                     if (currentScore > bestScore) {

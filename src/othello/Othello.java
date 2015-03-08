@@ -12,6 +12,7 @@ public class Othello {
 
         model.addObserver(view);
         view.addController(controller);
+        view.addKeyListener(controller.getKeyListener());
         model.updateBoard();
     }
 }
