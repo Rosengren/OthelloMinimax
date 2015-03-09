@@ -8,4 +8,6 @@ public interface AI {
     public Position selectMove(OthelloModel game) throws CloneNotSupportedException;
 
     public int getNumOfPositionsVisitedLastMove();
+
+    public int[][] getPreviouslyVisitedNodes();
 }

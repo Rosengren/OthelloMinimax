@@ -12,7 +12,7 @@ import java.util.Queue;
 
 public class Controller implements ActionListener {
 
-    private static final int TIME_BETWEEN_MOVES = 1000;
+//    private static final int TIME_BETWEEN_MOVES = 1000;
     private static final int DELAY = 50;
 
     private Queue<Position> queue;
@@ -51,6 +51,7 @@ public class Controller implements ActionListener {
         try {
             if (model.isRunning())
                 model.move(pos);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,10 +75,12 @@ public class Controller implements ActionListener {
                         return;
                     case KeyEvent.VK_1:
                         playMove(miniMaxAI.selectMove(model));
+                        model.highlightTiles(miniMaxAI.getPreviouslyVisitedNodes());
                         printMsg("Nodes Visited (MiniMax): " + miniMaxAI.getNumOfPositionsVisitedLastMove());
                         return;
                     case KeyEvent.VK_2:
                         playMove(miniMaxAlphaBetaAI.selectMove(model));
+                        model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
                         printMsg("Nodes Visited (MiniMax Alpha-Beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         return;
                     case KeyEvent.VK_3:

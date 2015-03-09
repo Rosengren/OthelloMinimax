@@ -32,6 +32,7 @@ public class View extends JFrame implements Observer {
 
     private static final Color LIGHT_COLORED_TILE = new Color(56,122,54);
     private static final Color DARK_COLORED_TILE = new Color(35,80,33);
+    private static final Color HIGHLIGHT_COLORED_TILE = new Color(101, 0, 7);
 
     private static final int BOARD_WIDTH = 8;
     private static final int BOARD_HEIGHT = 8;
@@ -211,6 +212,34 @@ public class View extends JFrame implements Observer {
             tiles[row][col].setIcon(null);
     }
 
+    public void resetBoardColors() {
+        for (int row = 0; row < tiles.length; row++) {
+            if (row % 2 == 0) {
+                for (int col = 0; col < tiles[row].length; col++) {
+                    if (col % 2 == 0) { // even
+                        colorTile(row, col, DARK_COLORED_TILE);
+                    } else {
+                        colorTile(row, col, LIGHT_COLORED_TILE);
+                    }
+                }
+            } else {
+                for (int col = 0; col < tiles[row].length; col++) {
+                    if (col % 2 == 0) { // even
+                        colorTile(row, col, LIGHT_COLORED_TILE);
+                    } else {
+                        colorTile(row, col, DARK_COLORED_TILE);
+                    }
+                }
+            }
+        }
+    }
+
+    public void colorTile(int row, int col, Color color) {
+        tiles[row][col].setBackground(color);
+        tiles[row][col].setForeground(color);
+        repaint();
+    }
+
 
     /**
      * set coordinates and add
@@ -287,7 +316,16 @@ public class View extends JFrame implements Observer {
 
         } else if (arg instanceof Board) {
             Board board = (Board)arg;
+            resetBoardColors();
             redrawBoard(board);
+        } else if (arg instanceof int[][]) {
+
+            resetBoardColors();
+
+            int[][] highlightCells = (int[][])arg;
+            for (int[] cell : highlightCells) {
+                colorTile(cell[0], cell[1], HIGHLIGHT_COLORED_TILE);
+            }
         }
     }
 

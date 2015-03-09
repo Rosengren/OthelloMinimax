@@ -334,6 +334,11 @@ public class OthelloModel extends Observable implements Cloneable {
         return board;
     }
 
+    public void highlightTiles(int[][] tiles) {
+        setChanged();
+        notifyObservers(tiles);
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
 

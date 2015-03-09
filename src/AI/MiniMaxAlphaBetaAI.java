@@ -4,6 +4,7 @@ import othello.Field;
 import othello.OthelloModel;
 import othello.Position;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -18,11 +19,10 @@ public class MiniMaxAlphaBetaAI implements AI {
 
     private HeuristicStrategy evaluate;
     private Stack<OthelloModel> games;
+    private ArrayList<int[]> visitedNodes;
 
     private Field computer;
     private Field opponent;
-
-    private int totalNodesVisited;
 
     public MiniMaxAlphaBetaAI() {
         evaluate = new HeuristicPieceCounter(); // default strategy
@@ -35,7 +35,8 @@ public class MiniMaxAlphaBetaAI implements AI {
 
     @Override
     public Position selectMove(OthelloModel game) throws CloneNotSupportedException {
-        totalNodesVisited = 0;
+
+        visitedNodes = new ArrayList<int[]>();
         games = new Stack<OthelloModel>();
         this.game = (OthelloModel)game.clone();
 
@@ -46,13 +47,18 @@ public class MiniMaxAlphaBetaAI implements AI {
         evaluate.setComputerAndOpponent(computer, opponent);
 
         bestOption = miniMax(MAX_DEPTH, computer, Integer.MIN_VALUE, Integer.MAX_VALUE);
-
+        System.out.println("Best Score: " + bestOption[0] + " = Chose: " + bestOption[BEST_ROW] + "," + bestOption[BEST_COL]);
         return new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
     }
 
     @Override
     public int getNumOfPositionsVisitedLastMove() {
-        return totalNodesVisited;
+        return visitedNodes.size();
+    }
+
+    @Override
+    public int[][] getPreviouslyVisitedNodes() {
+        return visitedNodes.toArray(new int[visitedNodes.size()][]);
     }
 
     /** MiniMax (recursive) at level of depth for maximizing or minimizing player
@@ -71,7 +77,9 @@ public class MiniMaxAlphaBetaAI implements AI {
             List<Position> nextMoves = game.getPossibleMoves(player);
 
             for (Position position : nextMoves) {
-                totalNodesVisited++;
+
+                visitedNodes.add(new int[] {position.x, position.y});
+
                 // Try this move for the current "player"
                 // push game to the stack and clone it
                 games.push(game);
@@ -80,13 +88,13 @@ public class MiniMaxAlphaBetaAI implements AI {
 
                 if (player == computer) {  // mySeed (computer) is maximizing player
                     score = miniMax(depth - 1, opponent, alpha, beta)[0];
-                    if (score >= alpha) {
+                    if (score > alpha) {
                         alpha = score;
                         bestPosition = position;
                     }
                 } else {  // oppSeed is minimizing player
                     score = miniMax(depth - 1, computer, alpha, beta)[0];
-                    if (score <= beta) {
+                    if (score < beta) {
                         beta = score;
                         bestPosition = position;
                     }

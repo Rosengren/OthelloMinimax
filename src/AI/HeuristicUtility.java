@@ -38,7 +38,9 @@ public class HeuristicUtility implements HeuristicStrategy {
 
     @Override
     public int evaluateBoard(Field[][] board) {
-        return (10 * parity(board)) + ( 80 * mobility(board)) +
+//        System.out.println("SCORES: parity=" + (10 * parity(board)) + " mobility=" + ( 80 * mobility(board)) +
+//                " corners=" + (800 * capturedCorners(board)) + " weighted=" + (10 * weightedPositions(board)));
+        return ( 80 * mobility(board)) + (10 * parity(board)) +
                (800 * capturedCorners(board)) + (10 * weightedPositions(board));
     }
 
