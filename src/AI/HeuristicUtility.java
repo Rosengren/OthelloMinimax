@@ -4,8 +4,16 @@ import othello.Field;
 
 public class HeuristicUtility implements HeuristicStrategy {
 
-    private final int[][] adjacentFields = {{-1, -1}, {0, -1}, {1, -1},
-            {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+    private static final int[][] positionScore =
+            new int[][] {{20, -3, 11,  8,  8, 11, -3, 20},
+                         {-3, -7, -4,  1,  1, -4, -7, -3},
+                         {11, -4,  2,  2,  2,  2, -4, 11},
+                         {8,   1,  2, -3, -3,  2,  1,  8},
+                         {8,   1,  2, -3, -3,  2,  1,  8},
+                         {11, -4,  2,  2,  2,  2, -4, 11},
+                         {-3, -7, -4,  1,  1, -4, -7, -3},
+                         {20, -3, 11,  8,  8, 11, -3, 20}};
+
 
     private Field computer;
     private Field opponent;
@@ -30,8 +38,8 @@ public class HeuristicUtility implements HeuristicStrategy {
 
     @Override
     public int evaluateBoard(Field[][] board) {
-//        return parity(board);
-        return mobility(board);
+        return (10 * parity(board)) + ( 80 * mobility(board)) +
+               (800 * capturedCorners(board)) + (10 * weightedPositions(board));
     }
 
     /**
@@ -73,17 +81,87 @@ public class HeuristicUtility implements HeuristicStrategy {
      *    return 0
      */
     private int mobility(Field[][] board) {
-        int maxPlayerMoves = num_valid_moves(computer, opponent, board);
-        int minPlayerMoves = num_valid_moves(opponent, computer, board);
-        if (maxPlayerMoves + minPlayerMoves != 0) {
-            return 100 * (maxPlayerMoves - minPlayerMoves) / (maxPlayerMoves + minPlayerMoves);
+        int maxPlayerMoves = numberOfValidMoves(computer, opponent, board);
+        int minPlayerMoves = numberOfValidMoves(opponent, computer, board);
+        if(maxPlayerMoves > minPlayerMoves)
+            return (100 * maxPlayerMoves)/(maxPlayerMoves + minPlayerMoves);
+        else if(maxPlayerMoves < minPlayerMoves)
+            return -(100 * minPlayerMoves)/(maxPlayerMoves + minPlayerMoves);
+        else
+            return 0;
+    }
+
+    /**
+     * Captured Corners
+     *
+     * Corners hold special importance because once captured, they cannot be
+     * flanked by the opponent. They also allow a player to build coins around
+     * them and provide stability to the player’s coins.
+     */
+    private int capturedCorners(Field[][] board) {
+        int maxPlayer = numberOfCapturedCorners(computer, board);
+        int minPlayer = numberOfCapturedCorners(opponent, board);
+
+        if (maxPlayer + minPlayer != 0) {
+            return 25 * (maxPlayer - minPlayer);
+//            return 100 * (maxPlayer - minPlayer) / (maxPlayer + minPlayer);
         }
+
+        return 0;
+    }
+
+    /**
+     * Weighted Positions
+     *
+     * Each position on the board has a different value. Corners are most
+     * valuable, followed by the sides. Center positions have the lowest
+     * value.
+     */
+    private int weightedPositions(Field[][] board) {
+
+        int maxPlayer = getPositionWeights(computer, board);
+        int minPlayer = getPositionWeights(opponent, board);
+
+        if (maxPlayer + minPlayer == 0) return 0;
+
+        if (maxPlayer > minPlayer)
+            return 100 * maxPlayer / (maxPlayer + minPlayer);
+        else if (maxPlayer < minPlayer)
+            return -(100 * maxPlayer / (maxPlayer + minPlayer));
+
         return 0;
     }
 
     /** HELPER METHODS **/
 
-    private int num_valid_moves(Field self, Field opp, Field[][] board)   {
+    private int getPositionWeights(Field player, Field[][] board) {
+
+        int result = 0;
+
+        for (int x = 0; x < board.length; x++) {
+            for (int y = 0; y < board[0].length; y++) {
+                if (board[x][y] == player)
+                    result += positionScore[x][y];
+            }
+        }
+
+        return  result;
+    }
+
+
+    private int numberOfCapturedCorners(Field player, Field[][] board) {
+        int result = 0;
+        if (board.length == 0) return result;
+        if (board[0].length == 0) return result;
+        if (board[0][0] == player) result++;
+        if (board[0][board[0].length - 1] == player) result++;
+        if (board[board.length - 1][0] == player) result++;
+        if (board[board.length -1][board[0].length - 1] == player) result++;
+
+        return result;
+    }
+
+    private int numberOfValidMoves(Field self, Field opp, Field[][] board)   {
         int count = 0, i, j;
         for(i = 0; i < board.length; i++)
             for(j = 0; j < board[i].length; j++)

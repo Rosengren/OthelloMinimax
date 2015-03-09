@@ -49,9 +49,8 @@ public class Controller implements ActionListener {
     public void playMove(Position pos) {
 
         try {
-            model.move(pos);
-            int[] score = model.getScore();
-            System.out.println("Score: Black = " + score[0] + ", White = " + score[1]);
+            if (model.isRunning())
+                model.move(pos);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,9 +91,10 @@ public class Controller implements ActionListener {
                         }
                         return;
                     case KeyEvent.VK_5:
+                        printMsg("MiniMaxAI = BLACK, MiniMaxAlphaBetaAI = WHITE");
                         while (model.isRunning()) {
-                            miniMaxAI.selectMove(model);
-                            miniMaxAlphaBetaAI.selectMove(model);
+                            playMove(miniMaxAI.selectMove(model));
+                            playMove(miniMaxAlphaBetaAI.selectMove(model));
                         }
                         return;
                     case KeyEvent.VK_6:
@@ -112,6 +112,10 @@ public class Controller implements ActionListener {
                         miniMaxAI.setStrategy(new HeuristicUtility());
                         miniMaxAlphaBetaAI.setStrategy(new HeuristicUtility());
                         printMsg("Heuristics set to: Utility");
+                        return;
+                    case KeyEvent.VK_T:
+                        miniMaxAlphaBetaAI.setStrategy(new HeuristicUtility());
+                        printMsg("MiniMax Alpha-Beta Heuristic set to: Utility");
                         return;
                     default:
                         break;
