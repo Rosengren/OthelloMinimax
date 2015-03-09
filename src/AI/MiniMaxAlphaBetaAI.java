@@ -34,7 +34,7 @@ public class MiniMaxAlphaBetaAI implements AI {
     }
 
     @Override
-    public Position selectMove(OthelloModel game) throws CloneNotSupportedException {
+    public Position selectMove(OthelloModel game) throws Exception {
 
         visitedNodes = new ArrayList<int[]>();
         games = new Stack<OthelloModel>();
@@ -47,7 +47,6 @@ public class MiniMaxAlphaBetaAI implements AI {
         evaluate.setComputerAndOpponent(computer, opponent);
 
         bestOption = miniMax(MAX_DEPTH, computer, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        System.out.println("Best Score: " + bestOption[0] + " = Chose: " + bestOption[BEST_ROW] + "," + bestOption[BEST_COL]);
         return new Position(bestOption[BEST_ROW], bestOption[BEST_COL]);
     }
 
@@ -63,18 +62,17 @@ public class MiniMaxAlphaBetaAI implements AI {
 
     /** MiniMax (recursive) at level of depth for maximizing or minimizing player
      with alpha-beta cut-off. Return int[3] of {score, row, col}  */
-    private int[] miniMax(int depth, Field player, int alpha, int beta) throws CloneNotSupportedException {
+    private int[] miniMax(int depth, Field player, int alpha, int beta) throws Exception {
 
+        List<Position> nextMoves = game.getPossibleMoves(player);
         Position bestPosition = new Position(-1, -1);
         int score;
 
-        if (!game.isRunning() || depth == 0) {
+        if (!game.isRunning() || depth == 0 || nextMoves.isEmpty()) {
             // Game over or depth reached, evaluate score
             score = evaluate.evaluateBoard(game.getBoard().getBoard());
             return new int[] {score, bestPosition.x, bestPosition.y};
         } else {
-
-            List<Position> nextMoves = game.getPossibleMoves(player);
 
             for (Position position : nextMoves) {
 

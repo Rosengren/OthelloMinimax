@@ -23,10 +23,15 @@ public class Controller implements ActionListener {
     private AI miniMaxAI;
     private AI miniMaxAlphaBetaAI;
 
+    private boolean playAgainstUtilityHeuristic;
+    private boolean playAgainstPieceCounterHeuristic;
+
     private OthelloModel model;
     private TAdapter keyPress;
 
     public Controller(OthelloModel model) {
+        playAgainstUtilityHeuristic = false;
+        playAgainstPieceCounterHeuristic = false;
         this.model = model;
         miniMaxAI = new MiniMaxAI();
         miniMaxAlphaBetaAI = new MiniMaxAlphaBetaAI();
@@ -52,9 +57,7 @@ public class Controller implements ActionListener {
             if (model.isRunning())
                 model.move(pos);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
 
 
@@ -101,8 +104,14 @@ public class Controller implements ActionListener {
                         }
                         return;
                     case KeyEvent.VK_6:
+                        miniMaxAlphaBetaAI.setStrategy(new HeuristicPieceCounter());
+                        playAgainstPieceCounterHeuristic = !playAgainstPieceCounterHeuristic;
+                        playAgainstUtilityHeuristic = false;
                         return;
                     case KeyEvent.VK_7:
+                        miniMaxAlphaBetaAI.setStrategy(new HeuristicUtility());
+                        playAgainstUtilityHeuristic = !playAgainstUtilityHeuristic;
+                        playAgainstPieceCounterHeuristic = false;
                         return;
                     case KeyEvent.VK_8:
                         return;
@@ -123,8 +132,8 @@ public class Controller implements ActionListener {
                     default:
                         break;
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception ignored) {
+
             }
         }
     }
@@ -147,6 +156,12 @@ public class Controller implements ActionListener {
 
                 Position playerMove = new Position(x, y);
                 playMove(playerMove);
+
+                if (playAgainstUtilityHeuristic ||
+                        playAgainstPieceCounterHeuristic) {
+                    playMove(miniMaxAlphaBetaAI.selectMove(model));
+                    model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
