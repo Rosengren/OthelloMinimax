@@ -24,6 +24,7 @@ public class Controller implements ActionListener {
 
     private boolean playAgainstUtilityHeuristic;
     private boolean playAgainstPieceCounterHeuristic;
+    private boolean highlightTiles;
 
     private OthelloModel model;
     private TAdapter keyPress;
@@ -31,6 +32,7 @@ public class Controller implements ActionListener {
     public Controller(OthelloModel model) {
         playAgainstUtilityHeuristic = false;
         playAgainstPieceCounterHeuristic = false;
+        highlightTiles = false;
         this.model = model;
         miniMaxAI = new MiniMaxAI();
         miniMaxAlphaBetaAI = new MiniMaxAlphaBetaAI();
@@ -50,12 +52,13 @@ public class Controller implements ActionListener {
         timer.start();
     }
 
-    public void playMove(Position pos) {
+    public void playMove(Position pos, String player) {
 
         try {
             if (model.isRunning())
                 model.move(pos);
 
+//            printMsg("Player " + player + " played: (" + pos.x + "," + pos.y + ")");
         } catch (Exception ignored) {}
     }
 
@@ -75,44 +78,46 @@ public class Controller implements ActionListener {
                         return;
                     case KeyEvent.VK_ESCAPE:
                         return;
-                    case KeyEvent.VK_1:
-                        playMove(miniMaxAI.selectMove(model));
-                        model.highlightTiles(miniMaxAI.getPreviouslyVisitedNodes());
+                    case KeyEvent.VK_1: // MiniMax Makes 1 Move
+                        playMove(miniMaxAI.selectMove(model), "MiniMax");
+                        if (highlightTiles)
+                            model.highlightTiles(miniMaxAI.getPreviouslyVisitedNodes());
                         printMsg("Nodes Visited (MiniMax): " + miniMaxAI.getNumOfPositionsVisitedLastMove());
                         return;
-                    case KeyEvent.VK_2:
-                        playMove(miniMaxAlphaBetaAI.selectMove(model));
-                        model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
+                    case KeyEvent.VK_2: // Alpha-Beta Makes 1 Move
+                        playMove(miniMaxAlphaBetaAI.selectMove(model), "AlphaBeta");
+                        if (highlightTiles)
+                            model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
                         printMsg("Nodes Visited (Alpha-Beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         return;
-                    case KeyEvent.VK_3:
+                    case KeyEvent.VK_3: // Play complete game with miniMax AI
                         while (model.isRunning()) {
-                            playMove(miniMaxAI.selectMove(model));
+                            playMove(miniMaxAI.selectMove(model), "MiniMax");
                             printMsg("Nodes visited: " + miniMaxAI.getNumOfPositionsVisitedLastMove());
                         }
                         return;
-                    case KeyEvent.VK_4:
+                    case KeyEvent.VK_4: // Play complete game with Alpha-Beta AI
                         while (model.isRunning()) {
-                            playMove(miniMaxAlphaBetaAI.selectMove(model));
+                            playMove(miniMaxAlphaBetaAI.selectMove(model), "AlphaBeta");
                             printMsg("Nodes visited: " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         }
                         return;
-                    case KeyEvent.VK_5:
+                    case KeyEvent.VK_5: // Play complete game with MiniMax vs Alpha-Beta
                         printMsg("MiniMaxAI = BLACK, MiniMaxAlphaBetaAI = WHITE");
                         while (model.isRunning()) {
-                            playMove(miniMaxAI.selectMove(model));
+                            playMove(miniMaxAI.selectMove(model), "MiniMax");
                             printMsg("Nodes visited (MiniMax): " + miniMaxAI.getNumOfPositionsVisitedLastMove());
-                            playMove(miniMaxAlphaBetaAI.selectMove(model));
+                            playMove(miniMaxAlphaBetaAI.selectMove(model), "AlphaBeta");
                             printMsg("Nodes visited (Alpha-beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         }
                         return;
-                    case KeyEvent.VK_6:
+                    case KeyEvent.VK_6: // Set the Alpha-Beta Heuristic to Piece Counter
                         miniMaxAlphaBetaAI.setStrategy(new HeuristicPieceCounter());
                         playAgainstPieceCounterHeuristic = !playAgainstPieceCounterHeuristic;
                         playAgainstUtilityHeuristic = false;
                         printMsg("Playing against Alpha-Beta Piece Counter Heuristic");
                         return;
-                    case KeyEvent.VK_7:
+                    case KeyEvent.VK_7: // Set Alpha-Beta Heuristic to Utility
                         miniMaxAlphaBetaAI.setStrategy(new HeuristicUtility());
                         playAgainstUtilityHeuristic = !playAgainstUtilityHeuristic;
                         playAgainstPieceCounterHeuristic = false;
@@ -133,6 +138,9 @@ public class Controller implements ActionListener {
                     case KeyEvent.VK_T:
                         miniMaxAlphaBetaAI.setStrategy(new HeuristicUtility());
                         printMsg("MiniMax Alpha-Beta Heuristic set to: Utility");
+                        return;
+                    case KeyEvent.VK_H:
+                        highlightTiles = !highlightTiles;
                         return;
                     default:
                         break;
@@ -160,12 +168,13 @@ public class Controller implements ActionListener {
                 int y = Integer.parseInt(str[COL]);
 
                 Position playerMove = new Position(x, y);
-                playMove(playerMove);
+                playMove(playerMove, "Human");
 
                 if (playAgainstUtilityHeuristic ||
                         playAgainstPieceCounterHeuristic) {
-                    playMove(miniMaxAlphaBetaAI.selectMove(model));
-                    model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
+                    playMove(miniMaxAlphaBetaAI.selectMove(model), "AlphaBeta");
+                    if (highlightTiles)
+                        model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
                     printMsg("Nodes visited (Alpha-beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                 }
             } catch (Exception ex) {
