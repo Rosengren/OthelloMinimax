@@ -12,7 +12,6 @@ import java.util.Queue;
 
 public class Controller implements ActionListener {
 
-//    private static final int TIME_BETWEEN_MOVES = 1000;
     private static final int DELAY = 50;
 
     private Queue<Position> queue;
@@ -84,34 +83,40 @@ public class Controller implements ActionListener {
                     case KeyEvent.VK_2:
                         playMove(miniMaxAlphaBetaAI.selectMove(model));
                         model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
-                        printMsg("Nodes Visited (MiniMax Alpha-Beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
+                        printMsg("Nodes Visited (Alpha-Beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         return;
                     case KeyEvent.VK_3:
                         while (model.isRunning()) {
                             playMove(miniMaxAI.selectMove(model));
+                            printMsg("Nodes visited: " + miniMaxAI.getNumOfPositionsVisitedLastMove());
                         }
                         return;
                     case KeyEvent.VK_4:
                         while (model.isRunning()) {
                             playMove(miniMaxAlphaBetaAI.selectMove(model));
+                            printMsg("Nodes visited: " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         }
                         return;
                     case KeyEvent.VK_5:
                         printMsg("MiniMaxAI = BLACK, MiniMaxAlphaBetaAI = WHITE");
                         while (model.isRunning()) {
                             playMove(miniMaxAI.selectMove(model));
+                            printMsg("Nodes visited (MiniMax): " + miniMaxAI.getNumOfPositionsVisitedLastMove());
                             playMove(miniMaxAlphaBetaAI.selectMove(model));
+                            printMsg("Nodes visited (Alpha-beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                         }
                         return;
                     case KeyEvent.VK_6:
                         miniMaxAlphaBetaAI.setStrategy(new HeuristicPieceCounter());
                         playAgainstPieceCounterHeuristic = !playAgainstPieceCounterHeuristic;
                         playAgainstUtilityHeuristic = false;
+                        printMsg("Playing against Alpha-Beta Piece Counter Heuristic");
                         return;
                     case KeyEvent.VK_7:
                         miniMaxAlphaBetaAI.setStrategy(new HeuristicUtility());
                         playAgainstUtilityHeuristic = !playAgainstUtilityHeuristic;
                         playAgainstPieceCounterHeuristic = false;
+                        printMsg("Playing against Utility Heuristic");
                         return;
                     case KeyEvent.VK_8:
                         return;
@@ -161,6 +166,7 @@ public class Controller implements ActionListener {
                         playAgainstPieceCounterHeuristic) {
                     playMove(miniMaxAlphaBetaAI.selectMove(model));
                     model.highlightTiles(miniMaxAlphaBetaAI.getPreviouslyVisitedNodes());
+                    printMsg("Nodes visited (Alpha-beta): " + miniMaxAlphaBetaAI.getNumOfPositionsVisitedLastMove());
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

@@ -38,8 +38,6 @@ public class HeuristicUtility implements HeuristicStrategy {
 
     @Override
     public int evaluateBoard(Field[][] board) {
-//        System.out.println("SCORES: parity=" + (10 * parity(board)) + " mobility=" + ( 80 * mobility(board)) +
-//                " corners=" + (800 * capturedCorners(board)) + " weighted=" + (10 * weightedPositions(board)));
         return ( 80 * mobility(board)) + (10 * parity(board)) +
                (800 * capturedCorners(board)) + (10 * weightedPositions(board));
     }
@@ -106,7 +104,6 @@ public class HeuristicUtility implements HeuristicStrategy {
 
         if (maxPlayer + minPlayer != 0) {
             return 25 * (maxPlayer - minPlayer);
-//            return 100 * (maxPlayer - minPlayer) / (maxPlayer + minPlayer);
         }
 
         return 0;
