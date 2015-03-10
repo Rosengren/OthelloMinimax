@@ -1,4 +1,4 @@
-# Othello
+# Othello MiniMax
 ### MiniMax and Alpha-Beta Pruning
 
 ### State Space
@@ -24,3 +24,18 @@ The second measurement is the number of potential moves each player can make. Th
 #### Node Count
 
 The node count is reduced dramatically when switching from MiniMax to MiniMax with alpha-beta pruning. This is because alpha-beta does not visit every node down to a specific depth. Instead, it compares the values at each level of the tree and skips (or prunes) any branch that has a lower score than another. The lower scored branch will not lead to a better move decision which is why it can be skipped without influencing the outcome of the game. With a branching factor b and a depth d, the node count is b<sup>d</sup>  while the node count for alpha-beta is b<sup>d/2</sup>.
+
+### Keyboard Bindings
+
+<b>ENTER</b>: reset game<br/>
+<b>1:</b> MiniMax makes 1 move<br/>
+<b>2:</b> Alpha-Beta makes 1 move<br/>
+<b>3:</b> Play complete game with MiniMax AI<br/>
+<b>4:</b> Play complete game with Alpha-Beta AI<br/>
+<b>5:</b> Play complete game with MiniMax vs Alpha-Beta<br/>
+<b>6:</b> Player Against Piece Counter Heuristic<br/>
+<b>7:</b> Player Against Utility Heuristic<br/>
+<b>P:</b> Set Heuristics to Piece Counter<br/>
+<b>U:</b> Set Heuristics to Utility<br/>
+<b>T:</b> Set Alpha-Beta Heuristic to Utility<br/>
+<b>H:</b> Highlight Tiles visited<br/>
